@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@react-navigation/bottom-tabs": "^5.2.3",
+    "uuid": "^7.0.2"
+  }
+}
