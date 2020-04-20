@@ -59,6 +59,6 @@ Resources:
         Api:
           Type: Api
           Properties:
-            RestApiId: !Ref MyApi
+            RestApiId: Api
             Path: /wines
             Method: GET
