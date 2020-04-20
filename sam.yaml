@@ -49,13 +49,12 @@ Resources:
     Properties:
       FunctionName: getAllWines
       CodeUri: getAllWines/
-      handler: index.handler
+      Handler: get.handler
       Timeout: 15
       # Environment:
       #   Variable
       Policies:
         - CloudWatchLogsFullAccess
-        - !Ref XRayLambdaPolicy
       Events:
         Api:
           Type: Api
