@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  lambda-vino-lambda
+
+  Sample SAM Template for vino-api
+
+
+
+Globals:
+  Function:
+    Timeout: 3
+    Runtime: nodejs10.x
+    Tracing: Active
+
+Resources:
+  # API
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: Wines
+      StageName: prod
+      EndpointConfiguration: EDGE
+      Cors:
+        AllowOrigin: "'*'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,Access-Control-Allow-Origin,Access-Control-Allow-Credentials'"
+      GatewayResponses:
+        DEFAULT_4XX:
+          StatusCode: 403
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+      MethodSettings:
+        - HttpMethod: "*"
+          ResourcePath: "/*"
+          LoggingLevel: INFO
+          DataTraceEnabled: true
+          MetricsEnabled: true
+      Auth:
+        DefaultAuthorizer: DefaultCognitoAuthorizer
+        Authorizers:
+          DefaultCognitoAuthorizer:
+            UserPoolArn: arn:aws:cognito-idp:us-east-1:831303585030:userpool/us-east-1_jorQ4BMVH
+      TracingEnabled: true
+
+  # Lambda Functions / Endpoints
+  GetAllWines:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getAllWines
+      CodeUri: getAllWines/
+      handler: index.handler
+      Timeout: 15
+      # Environment:
+      #   Variable
+      Policies:
+        - CloudWatchLogsFullAccess
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /wines
+            Method: GET

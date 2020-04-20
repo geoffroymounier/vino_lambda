@@ -1,0 +1,9 @@
+version:      0.1
+phases:
+  install:
+    commands:
+      - aws cloudformation package --template-file sam.yml --s3-bucket $BUCKET --output-template-file output_sam.yml
+artifacts:
+  type:       zip
+  files:
+    - output_sam.yml
