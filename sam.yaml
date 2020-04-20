@@ -55,6 +55,7 @@ Resources:
       #   Variable
       Policies:
         - CloudWatchLogsFullAccess
+        - !Ref XRayLambdaPolicy
       Events:
         Api:
           Type: Api
