@@ -19,7 +19,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name: Wines
-      StageName: prod
+      StageName: Prod
       EndpointConfiguration: EDGE
       Cors:
         AllowOrigin: "'*'"
@@ -43,6 +43,11 @@ Resources:
             UserPoolArn: arn:aws:cognito-idp:us-east-1:831303585030:userpool/us-east-1_jorQ4BMVH
       TracingEnabled: true
 
+  ApiBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      RestApiId: !Ref Api
+      Stage: Prod
   # Lambda Functions / Endpoints
   GetAllWines:
     Type: AWS::Serverless::Function
