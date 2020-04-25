@@ -5,8 +5,6 @@ Description: >
 
   Sample SAM Template for vino-api
 
-
-
 Globals:
   Function:
     Timeout: 3
@@ -48,7 +46,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: getAllWines
-      CodeUri: getAllWines/
+      CodeUri: s3:///vino-sam-build/30bf61e4fc454cacf7337688d3151ec0
       Handler: get.handler
       Timeout: 15
       # Environment:
@@ -60,5 +58,5 @@ Resources:
           Type: Api
           Properties:
             Path: /wines
-            Method: GET
+            Method: get
             RestApiId: !Ref Api
