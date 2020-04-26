@@ -7,5 +7,5 @@ phases:
       - npm install
 artifacts:
   files:
-    - buildspec-sam.yml
+    - buildspec-sam.yml 
     - sam.yaml
