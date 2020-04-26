@@ -4,6 +4,13 @@ Description: >
   lambda-vino-lambda
   Sample SAM Template for vino-api
 
+Parameters:
+  CertificateArn:
+    Type: String
+  CognitoPoolArn:
+    Type: String
+  DomainName:
+    Type: String
 
 Globals:
   Function:
@@ -18,7 +25,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name: Wines
-      StageName: prod
+      StageName: Prod
       EndpointConfiguration: EDGE
       Cors:
         AllowOrigin: "'*'"
@@ -39,35 +46,31 @@ Resources:
         DefaultAuthorizer: DefaultCognitoAuthorizer
         Authorizers:
           DefaultCognitoAuthorizer:
-            UserPoolArn: arn:aws:cognito-idp:us-east-1:831303585030:userpool/us-east-1_jorQ4BMVH
+            UserPoolArn: !Ref CognitoPoolArn
       TracingEnabled: true
 
-  ApiDeployment:
-    Type: 'AWS::ApiGateway::Deployment'
+  ApiDomainName:
+    Type: 'AWS::ApiGateway::DomainName'
     Properties:
-      RestApiId: !Ref Api
-      StageName: Prod
+      EndpointConfiguration:
+        Types:
+          - EDGE
+      CertificateArn: !Ref CertificateArn
+      DomainName: !Ref DomainName
 
-  ApiProdStage:
-    Type: 'AWS::ApiGateway::Stage'
+  ApiBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
     Properties:
-      DeploymentId: !Ref ApiDeploymente8a804a486
-      TracingEnabled: true
+      DomainName: !Ref ApiDomainName
       RestApiId: !Ref Api
-      MethodSettings:
-        - HttpMethod: '*'
-          MetricsEnabled: true
-          ResourcePath: /*
-          DataTraceEnabled: true
-          LoggingLevel: INFO
-    StageName: Prod
+      Stage: Prod
 
   # Lambda Functions / Endpoints
   GetAllWines:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: GetAllWines
-      CodeUri: s3//vino-sam-build/29f2a24a8168502f00fab70c4909dd42
+      CodeUri: /GetAllWines
       Handler: get.handler
       Timeout: 15
       # Environment:
