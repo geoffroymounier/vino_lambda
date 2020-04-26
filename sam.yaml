@@ -7,10 +7,13 @@ Description: >
 Parameters:
   CertificateArn:
     Type: String
+    Default: ""
   CognitoPoolArn:
     Type: String
+    Default: ""
   DomainName:
     Type: String
+    Default: ""
 
 Globals:
   Function:
