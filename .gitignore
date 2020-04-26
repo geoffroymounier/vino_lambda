@@ -1,6 +1,9 @@
 
 # Created by https://www.gitignore.io/api/osx,node,linux,windows
+<<<<<<< HEAD
 template-cfn.ymal
+=======
+>>>>>>> 58b01433f1f99556ed02248c35dd6494ee453b22
 
 ### Linux ###
 *~
