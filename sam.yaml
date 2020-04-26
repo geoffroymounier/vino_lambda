@@ -19,7 +19,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name: Wines
-      StageName: Prod
+      StageName: prod
       EndpointConfiguration: EDGE
       Cors:
         AllowOrigin: "'*'"
@@ -43,17 +43,32 @@ Resources:
             UserPoolArn: arn:aws:cognito-idp:us-east-1:831303585030:userpool/us-east-1_jorQ4BMVH
       TracingEnabled: true
 
-  ApiBasePathMapping:
-    Type: AWS::ApiGateway::BasePathMapping
+  ApiDeployment:
+    Type: 'AWS::ApiGateway::Deployment'
     Properties:
       RestApiId: !Ref Api
-      Stage: Prod
+      StageName: Prod
+
+  ApiProdStage:
+    Type: 'AWS::ApiGateway::Stage'
+    Properties:
+      DeploymentId: !Ref ApiDeploymente8a804a486
+      TracingEnabled: true
+      RestApiId: !Ref Api
+      MethodSettings:
+        - HttpMethod: '*'
+          MetricsEnabled: true
+          ResourcePath: /*
+          DataTraceEnabled: true
+          LoggingLevel: INFO
+    StageName: Prod
+
   # Lambda Functions / Endpoints
   GetAllWines:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: GetAllWines
-      CodeUri: getAllWines/
+      CodeUri: s3//vino-sam-build/29f2a24a8168502f00fab70c4909dd42
       Handler: get.handler
       Timeout: 15
       # Environment:
