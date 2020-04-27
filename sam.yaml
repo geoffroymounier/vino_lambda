@@ -116,3 +116,6 @@ Resources:
       RecordSets:
         - Name: !Ref ApiDomainName
           Type : A
+          AliasTarget:
+            HostedZoneId: Z2FDTNDATAQYW2
+            DNSName: !GetAtt ApiDomainName.DistributionDomainName
