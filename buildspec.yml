@@ -10,5 +10,6 @@ artifacts:
   files:
     - layers/**/*
     - getAllWines/**/*
+    - updateWineCollectionDb/**/*
     - buildspec-sam.yml
     - sam.yaml
