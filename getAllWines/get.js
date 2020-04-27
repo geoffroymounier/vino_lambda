@@ -1,42 +1,19 @@
 // const mongoose = require('mongoose');
-const { generateResponse } = require('/opt/nodejs/util')
-const dbUser =  process.env.DBUSER || null
-const dbPass = process.env.DBPASS || null
-const dbCluster = process.env.DBCLUSTER || null
+const { generateResponse, createConnection } = require('/opt/nodejs/util')
+const {dbUser,dbPass,dbCluster} =  process.env
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const ObjectId = Schema.Types.ObjectId
-const connnectString =  "mongodb+srv://"+dbUser+":"+dbPass+"@"+dbCluster+".mongodb.net/test"
 
 let conn = null;
 let Wine = null;
-function errorResponse(errorMessage, awsRequestId, callback) {
-  callback(null, {
-    statusCode: 500,
-    body: JSON.stringify({
-      Error: errorMessage,
-      Reference: awsRequestId,
-    }),
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-    },
-  });
-}
+
 
 exports.handler = async (event, context,callback) => {
   context.callbackWaitsForEmptyEventLoop = false
 
   if (conn == null) {
-  conn = await mongoose.createConnection(connnectString, {
-    bufferCommands: false, // Disable mongoose buffering
-    bufferMaxEntries: 0, // and MongoDB driver buffering
-    useFindAndModify:false,
-    useNewUrlParser: true,
-    autoIndex:false,
-    replicaSet:"Cluster0-shard-0",
-    ssl: true,
-    sslValidate: true,
-  });
+    conn = await createConnection({dbUser,dbPass,dbCluster});
     conn.model('Wine', new mongoose.Schema(new Schema(
       {
           cellarId: {type:ObjectId,required:true},
@@ -65,7 +42,7 @@ exports.handler = async (event, context,callback) => {
           cepage:[String],
           vue:[String]
       },
-
+      {timestamps:true}
     ));
     Wine = conn.model('Wine');
   } else {
@@ -79,8 +56,6 @@ exports.handler = async (event, context,callback) => {
     mostRecentUpdate ? {updatedAt : {'$gte':mostRecentUpdate }} : {},
     {cellarId : "5d20650b51531fcceabd73ba"} ,//{'$in' : req.cellars}}, // userId vaut saut req.params.uid , soit token.decoded.userId
   ]
-  // const lim = !isNaN(limit) ? parseInt(limit) : 10
-  // const sort = { [keyOrder||'region']: order || 1 }
 
   try {
     const wines = !!wineId
@@ -88,18 +63,10 @@ exports.handler = async (event, context,callback) => {
     : await Wine
       .find({'$and' : and })
       .select('_id cellarId stock favorite appelation domain annee country region color price moment');
-      // .sort( { [keyOrder||'region']: parseInt(order) || 1 } )
-      // .limit(lim)
 
-    callback(null, {
-      statusCode: 200,
-      body: JSON.stringify({wines,mostRecentUpdate:Date.now()}),
-      headers: {
-          'Access-Control-Allow-Origin': '*',
-      },
-    });
+    generateResponse(callback,{wines,mostRecentUpdate:Date.now()})
   } catch(err) {
-    errorResponse(err, context.awsRequestId, callback)
+    generateResponse(callback,{Error: errorMessage,Reference: awsRequestId},500)
   }
 
     // })
