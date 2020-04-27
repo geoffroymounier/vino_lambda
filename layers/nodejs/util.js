@@ -12,8 +12,8 @@ const generateResponse = (callback,payload, status = 200) => {
   })
 }
 
-const createConnection = async ({dbUser,dbPass,dbCluster}) => {
-  const connnectString =  "mongodb+srv://"+dbUser+":"+dbPass+"@"+dbCluster+".mongodb.net/test"
+const createConnection = async ({DBUSER,DBPASS,DBCLUSTER}) => {
+  const connnectString =  "mongodb+srv://"+DBUSER+":"+DBPASS+"@"+DBCLUSTER+".mongodb.net/test"
   const connection = await mongoose.createConnection(connnectString, {
     bufferCommands: false, // Disable mongoose buffering
     bufferMaxEntries: 0, // and MongoDB driver buffering

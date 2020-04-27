@@ -6,7 +6,7 @@ const { generateResponse, createConnection } = require('/opt/nodejs/util')
 const {DBUSER,DBPASS,DBCLUSTER} =  process.env
 const s3 = new AWS.S3();
 
-const AdminWineSchema = require('./adminWineSchema.js')
+const {AdminWineSchema} = require('./adminWineSchema.js')
 
 let conn = null;
 let AdminWine = null;

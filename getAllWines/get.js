@@ -13,7 +13,7 @@ exports.handler = async (event, context,callback) => {
   context.callbackWaitsForEmptyEventLoop = false
 
   if (conn == null) {
-    conn = await createConnection({dbUser,dbPass,dbCluster});
+    conn = await createConnection({DBUSER,DBPASS,DBCLUSTER});
     conn.model('Wine', new mongoose.Schema(new Schema(
       {
           cellarId: {type:ObjectId,required:true},
