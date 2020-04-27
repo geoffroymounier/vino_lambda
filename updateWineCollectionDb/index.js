@@ -50,7 +50,7 @@ exports.handler = async (event, context,callback) => {
      });
 
   } catch(err) {
-    generateResponse(callback,{Error: errorMessage,Reference: awsRequestId},500)
+    generateResponse(callback,{Error: err,Reference: awsRequestId},500)
   }
 
 }

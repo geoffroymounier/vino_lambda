@@ -66,7 +66,7 @@ exports.handler = async (event, context,callback) => {
 
     generateResponse(callback,{wines,mostRecentUpdate:Date.now()})
   } catch(err) {
-    generateResponse(callback,{Error: errorMessage,Reference: awsRequestId},500)
+    generateResponse(callback,{Error: err,Reference: awsRequestId},500)
   }
 
     // })

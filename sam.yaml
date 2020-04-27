@@ -113,7 +113,7 @@ Resources:
     Properties:
       FunctionName: UpdateWineCollectionDb
       CodeUri: updateWineCollectionDb
-      Handler: get.handler
+      Handler: index.handler
       Timeout: 15
       Environment:
         Variables:
