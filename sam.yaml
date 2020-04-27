@@ -73,7 +73,15 @@ Resources:
       RestApiId: !Ref Api
       Stage: Prod
 
-
+  #Buckets
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: admin-wines
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !GetAtt UpdateWineCollectionDb.Arn
   # Lambda Functions / Endpoints
   GetAllWines:
     Type: AWS::Serverless::Function
@@ -126,15 +134,6 @@ Resources:
       CompatibleRuntimes:
         - nodejs10.x
       RetentionPolicy: Retain
-
-  Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: admin-wines
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Event: s3:ObjectCreated:*
-            Function: !GetAtt UpdateWineCollectionDb.Arn
 
   DomainNameRoute53RecordSet:
     Type: AWS::Route53::RecordSetGroup
