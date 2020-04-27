@@ -1,7 +1,4 @@
-const AWS = require('aws-sdk')
 const mongoose = require('mongoose')
-const request = require('request')
-
 
 const generateResponse = (callback,payload, status = 200) => {
   callback(null, {

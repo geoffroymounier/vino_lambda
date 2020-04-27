@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "mongoose": "^5.9.6",
-    "fast-csv":"4.1.3"
-  }
-}

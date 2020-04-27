@@ -9,5 +9,6 @@ phases:
 artifacts:
   files:
     - layers/layer_node/**/*
+    - GetAllWines/**/*
     - buildspec-sam.yml
     - sam.yaml
