@@ -28,7 +28,7 @@ const createConnection = async ({dbUser,dbPass,dbCluster}) => {
     sslValidate: true,
   });
   return connection
-})
+}
 
 module.exports = {
   generateResponse,
