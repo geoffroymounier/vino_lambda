@@ -162,10 +162,10 @@ Resources:
     Properties:
       LayerName: CommonNode
       Description: Common code for NodeJS
-      ContentUri: layers/layer_node/
+      ContentUri: layers/layer_node
       CompatibleRuntimes:
         - nodejs10.x
-      RetentionPolicy: Retain
+      RetentionPolicy: Delete
 
   DomainNameRoute53RecordSet:
     Type: AWS::Route53::RecordSetGroup
