@@ -1,4 +1,5 @@
 // const mongoose = require('mongoose');
+const { generateResponse } = require('/opt/nodejs/util')
 const dbUser =  process.env.DBUSER || null
 const dbPass = process.env.DBPASS || null
 const dbCluster = process.env.DBCLUSTER || null
@@ -64,7 +65,7 @@ exports.handler = async (event, context,callback) => {
           cepage:[String],
           vue:[String]
       },
-      {timestamps:true})
+
     ));
     Wine = conn.model('Wine');
   } else {

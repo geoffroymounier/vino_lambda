@@ -7,6 +7,7 @@ Description: >
 Parameters:
   CertificateArn:
     Type: String
+
   CognitoPoolArn:
     Type: String
   DomainName:
@@ -84,3 +85,13 @@ Resources:
             Path: /wines
             Method: get
             RestApiId: !Ref Api
+
+  CommonNodeLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: CommonNode
+      Description: Common code for NodeJS
+      ContentUri: layers/layer_node/
+      CompatibleRuntimes:
+        - nodejs10.x
+      RetentionPolicy: Retain

@@ -4,8 +4,10 @@ phases:
     runtime-versions:
       nodejs: 10
     commands:
+      - cd $CODEBUILD_SRC_DIR/layers/layer_node/nodejs/
       - npm install
 artifacts:
   files:
-    - buildspec-sam.yml 
+    - layers/layer_node/**/*
+    - buildspec-sam.yml
     - sam.yaml
