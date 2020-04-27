@@ -82,6 +82,7 @@ Resources:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:*
             Function: !GetAtt UpdateWineCollectionDb.Arn
+
   # Lambda Functions / Endpoints
   GetAllWines:
     Type: AWS::Serverless::Function
@@ -124,6 +125,37 @@ Resources:
       Policies:
         - CloudWatchLogsFullAccess
         - AmazonS3FullAccess
+
+  S3InvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref UpdateWineCollectionDb
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub arn:aws:s3:::admin-wines
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: '/'
+      Policies:
+      - PolicyName: s3
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+              - s3:Get*
+            Resource:
+              - !Sub arn:aws:s3:::admin-wines
+              - !Sub arn:aws:s3:::admin-wines/*
 
   CommonNodeLayer:
     Type: AWS::Serverless::LayerVersion
