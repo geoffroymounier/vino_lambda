@@ -7,10 +7,15 @@ Description: >
 Parameters:
   CertificateArn:
     Type: String
-
   CognitoPoolArn:
     Type: String
   DomainName:
+    Type: String
+  DbUser:
+    Type: String
+  DbPass:
+    Type: String
+  DbCluster:
     Type: String
 
 Globals:
@@ -74,8 +79,13 @@ Resources:
       CodeUri: getAllWines
       Handler: get.handler
       Timeout: 15
-      # Environment:
-      #   Variable
+      Environment:
+        Variables:
+          DBPASS: !Ref DbPass
+          DBCLUSTER: !Ref DbCluster
+          DBUSER: !Ref DbUser
+      Layers:
+        - !Ref CommonNodeLayer
       Policies:
         - CloudWatchLogsFullAccess
       Events:
