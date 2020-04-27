@@ -4,11 +4,11 @@ phases:
     runtime-versions:
       nodejs: 10
     commands:
-      - cd $CODEBUILD_SRC_DIR/layers/layer_node/nodejs/
-      - npm install
+      - cd $CODEBUILD_SRC_DIR/layers/nodejs/
+      - npm install --save
 artifacts:
   files:
-    - layers/layer_node/**/*
+    - layers/**/*
     - getAllWines/**/*
     - buildspec-sam.yml
     - sam.yaml
