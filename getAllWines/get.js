@@ -1,6 +1,6 @@
 // const mongoose = require('mongoose');
 const { generateResponse, createConnection } = require('/opt/nodejs/util')
-const {dbUser,dbPass,dbCluster} =  process.env
+const {DBUSER,DBPASS,DBCLUSTER} =  process.env
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const ObjectId = Schema.Types.ObjectId

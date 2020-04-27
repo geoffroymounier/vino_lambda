@@ -3,7 +3,7 @@ const csv = require('fast-csv');
 const mongoose = require('mongoose')
 
 const { generateResponse, createConnection } = require('/opt/nodejs/util')
-const {dbUser,dbPass,dbCluster} =  process.env
+const {DBUSER,DBPASS,DBCLUSTER} =  process.env
 const s3 = new AWS.S3();
 
 const AdminWineSchema = require('./adminWineSchema.js')
@@ -22,7 +22,7 @@ exports.handler = async (event, context,callback) => {
   };
 
   if (conn == null) {
-    conn = await createConnection({dbUser,dbPass,dbCluster});
+    conn = await createConnection({DBUSER,DBPASS,DBCLUSTER});
     conn.model('Admin-Wine', new mongoose.Schema(AdminWineSchema));
     AdminWine = conn.model('Admin-Wine');
   } else {
