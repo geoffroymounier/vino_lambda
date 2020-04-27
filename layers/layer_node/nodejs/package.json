@@ -1,4 +1,9 @@
 {
+  "name": "layer_node",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Geoffroy Mounier",
+  "license": "ISC",
   "dependencies": {
     "mongoose": "^5.9.6",
     "fast-csv":"4.1.3"
