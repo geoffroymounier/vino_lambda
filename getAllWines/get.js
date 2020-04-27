@@ -42,7 +42,7 @@ exports.handler = async (event, context,callback) => {
           cepage:[String],
           vue:[String]
       },
-      {timestamps:true}
+      {timestamps:true})
     ));
     Wine = conn.model('Wine');
   } else {
