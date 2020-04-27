@@ -114,5 +114,5 @@ Resources:
     Properties:
       HostedZoneId: !Ref HostedZoneId
       RecordSets:
-        Name: !Ref ApiDomainName
-        Type : A
+        - Name: !Ref ApiDomainName
+          Type : A
