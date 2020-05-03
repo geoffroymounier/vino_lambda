@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const csv = require('csvtojson');
+const csvtojson = require('csvtojson');
 const mongoose = require('mongoose');
 const { generateResponse, createConnection } = require('/opt/nodejs/util');
 const {DBUSER,DBPASS,DBCLUSTER} =  process.env;
@@ -16,8 +16,7 @@ exports.handler = async (event, context,callback) => {
   // connect to DB
   if (conn == null) {
     conn = await createConnection({DBUSER,DBPASS,DBCLUSTER});
-    conn.model('Admin-Wine', new mongoose.Schema(AdminWineSchema));
-    AdminWineModel = conn.model('Admin-Wine');
+    AdminWineModel = conn.model('Admin-Wine', new mongoose.Schema(AdminWineSchema));
   } else {
     console.log('cached');
   }
@@ -32,15 +31,24 @@ exports.handler = async (event, context,callback) => {
 
   try {
     const stream = await s3.getObject(params).createReadStream();
-    const entries = (await csv().fromStream(stream)).reduce((arr,entry) =>
+    const entries = (await csvtojson().fromStream(stream)).reduce((arr,entry) =>
       [...arr,{
         _id : entry._id || new mongoose.Types.ObjectId(),
         ...entry
       }],[]);
-      const adminWine = new AdminWineModel();
-      const wines = await adminWine.save(entries);
-      console.log({wines});
+      // const adminWine = new AdminWineModel();
+      const wines = (await AdminWineModel.insertMany(entries));
+
+      const header = Object.keys(wines[0].toJSON()).map(_ => JSON.stringify(_)).join(';') + '\n'
+      const replacedData = wines.reduce((acc, row) =>
+         acc + Object.values(row.toJSON()).map(_ => JSON.stringify(_)).join(';') + '\n'
+      , header)
+
+      const s3Response = await s3.putObject({...params,Body:replacedData}).promise();
       generateResponse(callback,{message:entries.length + ' wine(s) successfully uploaded.'});
+
+
+
   } catch (err){
     console.log({err});
     generateResponse(callback,{Error: err,Reference: context.awsRequestId},500);
