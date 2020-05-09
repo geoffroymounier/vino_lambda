@@ -43,9 +43,13 @@ exports.handler = async (event, context,callback) => {
     let wines = []
 
     for (var entry of csvFile) {
+      const docData = Object.keys(entry).reduce((json,e) =>
+        /\n/.test(entry[e]) ? {...json, [e] : entry[e].split('\n')}
+        : {...json,[e]:entry[e]}
+      ,{})
       const wine =  await AdminWineModel.findOneAndUpdate(
         {_id : entry._id || new mongoose.Types.ObjectId()} ,
-        {...entry},{new: true,upsert:true}
+        {...docData},{new: true,upsert:true}
       )
       wines.push(wine)
     }
