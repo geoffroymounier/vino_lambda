@@ -12,6 +12,18 @@ let AdminWineModel = null;
 
 exports.handler = async (event, context,callback) => {
   context.callbackWaitsForEmptyEventLoop = false;
+    // connect to Bucket
+
+  const srcBucket = event.Records[0].s3.bucket.name;
+  const srcKey = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
+  const params = {
+    Bucket: srcBucket,
+    Key: srcKey
+  };
+  if (/^REPLACE_/.test(srcKey)) {
+    generateResponse(callback,{message:'Replaced CSV should not call function.'});
+    return
+  }
 
   // connect to DB
   if (conn == null) {
@@ -21,31 +33,31 @@ exports.handler = async (event, context,callback) => {
     console.log('cached');
   }
 
-  // connect to Bucket
-  const srcBucket = event.Records[0].s3.bucket.name;
-  const srcKey = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
-  const params = {
-    Bucket: srcBucket,
-    Key: srcKey
-  };
+
 
   try {
     const stream = await s3.getObject(params).createReadStream();
-    const entries = (await csvtojson().fromStream(stream)).reduce((arr,entry) =>
-      [...arr,{
-        _id : entry._id || new mongoose.Types.ObjectId(),
-        ...entry
-      }],[]);
+    const csvFile = await csvtojson({
+      delimiter:";"
+    }).fromStream(stream)
+    let wines = []
+
+    for (var entry of csvFile) {
+      const wine =  await AdminWineModel.findOneAndUpdate(
+        {_id : entry._id || new mongoose.Types.ObjectId()} ,
+        {...entry},{new: true,upsert:true}
+      )
+      wines.push(wine)
+    }
+
       // const adminWine = new AdminWineModel();
-      const wines = (await AdminWineModel.insertMany(entries));
 
       const header = Object.keys(wines[0].toJSON()).map(_ => JSON.stringify(_)).join(';') + '\n'
-      const replacedData = wines.reduce((acc, row) =>
-         acc + Object.values(row.toJSON()).map(_ => JSON.stringify(_)).join(';') + '\n'
-      , header)
-
-      const s3Response = await s3.putObject({...params,Body:replacedData}).promise();
-      generateResponse(callback,{message:entries.length + ' wine(s) successfully uploaded.'});
+      const replacedData = wines.reduce((acc, row) => {
+        return acc + Object.values(row.toJSON()).map(_ => JSON.stringify(_)).join(';') + '\n'
+      }, header)
+      const s3Response = await s3.putObject({...params,Key:`REPLACE_${srcKey}`,Body:replacedData}).promise();
+      generateResponse(callback,{message:wines.length + ' wine(s) successfully uploaded.'});
 
 
 
