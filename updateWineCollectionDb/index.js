@@ -20,7 +20,7 @@ exports.handler = async (event, context,callback) => {
     Bucket: srcBucket,
     Key: srcKey
   };
-  if (/_UPDATED$/.test(srcKey)) {
+  if (/_UPDATED\.csv$/.test(srcKey)) {
     generateResponse(callback,{message:'Replaced CSV should not call function.'});
     return
   }
@@ -39,29 +39,40 @@ exports.handler = async (event, context,callback) => {
     const stream = await s3.getObject(params).createReadStream();
     const csvFile = await csvtojson({
       delimiter:";"
-    }).fromStream(stream)
-    let wines = []
+    }).fromStream(stream);
+
+    let bulkWrites = [];
 
     for (var entry of csvFile) {
+
       const docData = Object.keys(entry).reduce((json,e) =>
         /\n/.test(entry[e]) ? {...json, [e] : entry[e].split('\n')}
         : {...json,[e]:entry[e]}
-      ,{})
-      const wine =  await AdminWineModel.findOneAndUpdate(
-        {_id : entry._id || new mongoose.Types.ObjectId()} ,
-        {...docData},{new: true,upsert:true}
-      )
-      wines.push(wine)
-    }
+      ,{});
 
-      // const adminWine = new AdminWineModel();
+      bulkWrites.push(
+      { "updateOne" :
+        {
+           "filter": {_id : entry._id || new mongoose.Types.ObjectId()},
+           "update": docData,
+           "upsert": true,
+        }
+      })
+      }
 
-      const header = Object.keys(wines[0].toJSON()).map(_ => JSON.stringify(_)).join(';') + '\n'
+      await AdminWineModel.bulkWrite(bulkWrites);
+
+      const wines = await AdminWineModel.find({})
+      const header = Object.keys(wines[0].toJSON()).map(_ => JSON.stringify(_)).join(';') + '\n';
       const replacedData = wines.reduce((acc, row) => {
-        return acc + Object.values(row.toJSON()).map(_ => JSON.stringify(_)).join(';') + '\n'
-      }, header)
-      const s3Delete = await s3.deleteObject({...params,Key:srcKey}).promise();
-      const s3Update = await s3.putObject({...params,Key:`${srcKey}_UPDATED`,Body:replacedData}).promise();
+        return acc + Object.values(row.toJSON()).map(_ =>
+          Array.isArray(_) ?  "\"" + (_.join("\n")) + "\"" : JSON.stringify(_)
+        ).join(';') + '\n';
+      }, header);
+
+
+      await s3.deleteObject({...params,Key:srcKey}).promise();
+      await s3.putObject({...params,Key:`${srcKey.replace(/\.csv$/,'_UPDATED.csv')}`,Body:replacedData}).promise();
       generateResponse(callback,{message:wines.length + ' wine(s) successfully uploaded.'});
 
 
