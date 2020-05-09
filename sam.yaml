@@ -80,7 +80,7 @@ Resources:
       BucketName: admin-wines
       NotificationConfiguration:
         LambdaConfigurations:
-          - Event: s3:ObjectCreated:Post
+          - Event: s3:ObjectCreated:*
             Function: !GetAtt UpdateWineCollectionDb.Arn
 
   # Lambda Functions / Endpoints

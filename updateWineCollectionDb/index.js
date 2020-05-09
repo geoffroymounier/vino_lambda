@@ -20,7 +20,7 @@ exports.handler = async (event, context,callback) => {
     Bucket: srcBucket,
     Key: srcKey
   };
-  if (/^REPLACE_/.test(srcKey)) {
+  if (/_UPDATED$/.test(srcKey)) {
     generateResponse(callback,{message:'Replaced CSV should not call function.'});
     return
   }
@@ -56,7 +56,8 @@ exports.handler = async (event, context,callback) => {
       const replacedData = wines.reduce((acc, row) => {
         return acc + Object.values(row.toJSON()).map(_ => JSON.stringify(_)).join(';') + '\n'
       }, header)
-      const s3Response = await s3.putObject({...params,Key:`REPLACE_${srcKey}`,Body:replacedData}).promise();
+      const s3Delete = await s3.deleteObject({...params,Key:srcKey}).promise();
+      const s3Update = await s3.putObject({...params,Key:`${srcKey}_UPDATED`,Body:replacedData}).promise();
       generateResponse(callback,{message:wines.length + ' wine(s) successfully uploaded.'});
 
 
