@@ -114,7 +114,7 @@ Resources:
       FunctionName: UpdateWineCollectionDb
       CodeUri: updateWineCollectionDb
       Handler: index.handler
-      Timeout: 15
+      Timeout: 30
       Environment:
         Variables:
           DBPASS: !Ref DbPass
@@ -125,6 +125,30 @@ Resources:
       Policies:
         - CloudWatchLogsFullAccess
         - AmazonS3FullAccess
+
+  FindInWineAdminWine:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: FindInWineAdminWine
+      CodeUri: findInWineAdminWine
+      Handler: index.handler
+      Timeout: 15
+      Environment:
+        Variables:
+          DBPASS: !Ref DbPass
+          DBCLUSTER: !Ref DbCluster
+          DBUSER: !Ref DbUser
+      Layers:
+        - !Ref CommonNodeLayer
+      Policies:
+        - CloudWatchLogsFullAccess
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /admin-wines
+            Method: get
+            RestApiId: !Ref Api
 
   S3InvokeLambdaPermission:
     Type: AWS::Lambda::Permission
