@@ -5,6 +5,7 @@ const ObjectId = Schema.Types.ObjectId
 module.exports = {
   AdminWineSchema : new Schema(
     {
+        text: String,
         appelation: String,
         appelationType: String,
         classification : String,

@@ -9,8 +9,8 @@ let AdminWineModel = null;
 
 exports.handler = async (event, context,callback) => {
   context.callbackWaitsForEmptyEventLoop = false;
-  const {queryStringParameters = {}} = event
-  const {search = ''} = queryStringParameters
+  const {queryStringParameters = {}} = event;
+  const {search = ''} = queryStringParameters;
   // connect to DB
   if (conn == null) {
     conn = await createConnection({DBUSER,DBPASS,DBCLUSTER});
@@ -21,15 +21,15 @@ exports.handler = async (event, context,callback) => {
 
 
   try {
-    const wines = await AdminWineModel.find(.find(
-      {'$or' : [
-        {domain : new RegExp(search, "gi")},
-        {region : new RegExp(search, "gi")},
-        {appelation : new RegExp(search, "gi")} ,
-        {country : new RegExp(search, "gi")}
-      ]}
-    ))
-    generateResponse(callback,{wines})
+    const wines = await AdminWineModel.find(
+      {$text:
+        {
+          $search: new RegExp(search, "gi"),
+          $diacriticSensitive: false
+        }
+      }
+    ).limit(10);
+    generateResponse(callback,{wines});
 
   } catch (err){
     console.log({err});

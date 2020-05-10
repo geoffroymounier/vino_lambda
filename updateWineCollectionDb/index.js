@@ -54,7 +54,7 @@ exports.handler = async (event, context,callback) => {
       { "updateOne" :
         {
            "filter": {_id : entry._id || new mongoose.Types.ObjectId()},
-           "update": docData,
+           "update": {...docData,text:`${docData.domain || ''} ${docData.appelation} ${docData.region}`},
            "upsert": true,
         }
       })
