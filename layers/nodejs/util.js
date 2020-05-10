@@ -1,5 +1,18 @@
 const mongoose = require('mongoose')
 
+const removeAccents = (str) => {
+  let accents = 'ÀÁÂÃÄÅàáâãäåßÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž';
+  let accentsOut = "AAAAAAaaaaaaBOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz";
+  str = str.split('');
+  str.forEach((letter, index) => {
+    let i = accents.indexOf(letter);
+    if (i != -1) {
+      str[index] = accentsOut[i];
+    }
+  })
+  return str.join('');
+}
+
 const generateResponse = (callback,payload, status = 200) => {
   callback(null, {
     "statusCode": status,
@@ -29,5 +42,6 @@ const createConnection = async ({DBUSER,DBPASS,DBCLUSTER}) => {
 
 module.exports = {
   generateResponse,
-  createConnection
+  createConnection,
+  removeAccents
 }

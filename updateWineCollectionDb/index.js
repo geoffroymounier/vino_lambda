@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const csvtojson = require('csvtojson');
 const mongoose = require('mongoose');
-const { generateResponse, createConnection } = require('/opt/nodejs/util');
+const { generateResponse, createConnection, removeAccents } = require('/opt/nodejs/util');
 const {DBUSER,DBPASS,DBCLUSTER} =  process.env;
 const s3 = new AWS.S3();
 
@@ -22,7 +22,7 @@ exports.handler = async (event, context,callback) => {
   };
   if (/_UPDATED\.csv$/.test(srcKey)) {
     generateResponse(callback,{message:'Replaced CSV should not call function.'});
-    return
+    return;
   }
 
   // connect to DB
@@ -54,15 +54,15 @@ exports.handler = async (event, context,callback) => {
       { "updateOne" :
         {
            "filter": {_id : entry._id || new mongoose.Types.ObjectId()},
-           "update": {...docData,text:`${docData.domain || ''} ${docData.appelation} ${docData.region}`},
+           "update": {...docData,text:removeAccents(`${docData.domain || ''} ${docData.appelation} ${docData.region}`)},
            "upsert": true,
         }
-      })
+      });
       }
 
       await AdminWineModel.bulkWrite(bulkWrites);
 
-      const wines = await AdminWineModel.find({})
+      const wines = await AdminWineModel.find({});
       const header = Object.keys(wines[0].toJSON()).map(_ => JSON.stringify(_)).join(';') + '\n';
       const replacedData = wines.reduce((acc, row) => {
         return acc + Object.values(row.toJSON()).map(_ =>

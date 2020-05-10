@@ -22,14 +22,9 @@ exports.handler = async (event, context,callback) => {
 
   try {
     const wines = await AdminWineModel.find(
-      {$text:
-        {
-          $search: new RegExp(search, "gi"),
-          $diacriticSensitive: false
-        }
-      }
-    ).limit(10);
-    generateResponse(callback,{wines});
+      {text : new RegExp(search, "gi")}
+    );
+    generateResponse(callback,wines);
 
   } catch (err){
     console.log({err});
