@@ -39,7 +39,7 @@ exports.handler = async (event, context,callback) => {
           bouche:[String],
           pastilles:[String],
           accords:[String],
-          cepage:[String],
+          cepage:[{color:String,name:String,share:Number}],
           vue:[String]
       },
       {timestamps:true})
