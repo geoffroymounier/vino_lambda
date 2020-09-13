@@ -104,33 +104,33 @@ Resources:
           Api:
             Type: Api
             Properties:
-              Path: /wines
-              Method: post
-              RestApiId: !Ref Api
-
-  UpdateWine:
-      Type: AWS::Serverless::Function
-      Properties:
-        FunctionName: SetWine
-        CodeUri: setWine
-        Handler: index.handler
-        Timeout: 15
-        Environment:
-          Variables:
-            DBPASS: !Ref DbPass
-            DBCLUSTER: !Ref DbCluster
-            DBUSER: !Ref DbUser
-        Layers:
-          - !Ref CommonNodeLayer
-        Policies:
-          - CloudWatchLogsFullAccess
-        Events:
-          Api:
-            Type: Api
-            Properties:
               Path: /wines/{wineId}
               Method: post
               RestApiId: !Ref Api
+
+  # UpdateWine:
+  #     Type: AWS::Serverless::Function
+  #     Properties:
+  #       FunctionName: SetWine
+  #       CodeUri: setWine
+  #       Handler: index.handler
+  #       Timeout: 15
+  #       Environment:
+  #         Variables:
+  #           DBPASS: !Ref DbPass
+  #           DBCLUSTER: !Ref DbCluster
+  #           DBUSER: !Ref DbUser
+  #       Layers:
+  #         - !Ref CommonNodeLayer
+  #       Policies:
+  #         - CloudWatchLogsFullAccess
+  #       Events:
+  #         Api:
+  #           Type: Api
+  #           Properties:
+  #             Path: /wines/{wineId}
+  #             Method: post
+  #             RestApiId: !Ref Api
 
   GetAllWines:
     Type: AWS::Serverless::Function
