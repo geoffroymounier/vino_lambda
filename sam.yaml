@@ -89,7 +89,7 @@ Resources:
       Properties:
         FunctionName: SetWine
         CodeUri: setWine
-        Handler: post.handler
+        Handler: index.handler
         Timeout: 15
         Environment:
           Variables:
