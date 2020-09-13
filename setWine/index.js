@@ -67,6 +67,4 @@ exports.handler = async (event, context, callback) => {
   } catch (err) {
     generateResponse(callback, { Error: err, Reference: context.awsRequestId }, 500);
   }
-
-
-}
+};

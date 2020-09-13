@@ -1,16 +1,16 @@
-// const mongoose = require('mongoose');
-const { generateResponse, createConnection } = require('/opt/nodejs/util')
-const {DBUSER,DBPASS,DBCLUSTER} =  process.env
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-const ObjectId = Schema.Types.ObjectId
+const { generateResponse, createConnection } = require('/opt/nodejs/util');
+const {DBUSER,DBPASS,DBCLUSTER} =  process.env;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const {ObjectId} = mongoose.Types;
+
 
 let conn = null;
 let Wine = null;
 
 
 exports.handler = async (event, context,callback) => {
-  context.callbackWaitsForEmptyEventLoop = false
+  context.callbackWaitsForEmptyEventLoop = false;
 
   if (conn == null) {
     conn = await createConnection({DBUSER,DBPASS,DBCLUSTER});
@@ -18,7 +18,6 @@ exports.handler = async (event, context,callback) => {
       {
           cellarId: {type:ObjectId,required:true},
           stock : Number,
-          photo:String,
           favorite : Boolean,
           appelation: String,
           domain: String,
@@ -46,17 +45,17 @@ exports.handler = async (event, context,callback) => {
     ));
     Wine = conn.model('Wine');
   } else {
-    console.log('cached')
+    console.log('cached');
   }
-  const {wineId} = event.pathParameters || {}
-  const userId = event.requestContext.authorizer.claims.email
-  const {keyOrder,order,limit,mostRecentUpdate,cellarId} = event.queryStringParameters || {}
+  const {wineId} = event.pathParameters || {};
+  const userId = event.requestContext.authorizer.claims.email;
+  const {keyOrder,order,limit,mostRecentUpdate,cellarId} = event.queryStringParameters || {};
   const and = [
     {userId},
     wineId ?  {_id : wineId} : {},
     mostRecentUpdate ? {updatedAt : {'$gte':mostRecentUpdate }} : {},
-    cellarId ? {cellarId} : {} ,//{'$in' : req.cellars}}, // userId vaut saut req.params.uid , soit token.decoded.userId
-  ]
+    cellarId ? {cellarId} : {},
+  ];
 
   try {
     const wines = !!wineId
@@ -65,14 +64,8 @@ exports.handler = async (event, context,callback) => {
       .find({'$and' : and })
       .select('_id cellarId stock favorite appelation domain annee country region color price moment');
 
-    generateResponse(callback,{wines,mostRecentUpdate:Date.now()})
+    generateResponse(callback,{wines,mostRecentUpdate:Date.now()});
   } catch(err) {
-    generateResponse(callback,{Error: err,Reference: context.awsRequestId},500)
+    generateResponse(callback,{Error: err,Reference: context.awsRequestId},500);
   }
-
-    // })
-    // .catch((err) => {
-    //   console.log(err)
-    //   errorResponse(err, context.awsRequestId, callback)
-    // })
-}
+};
