@@ -1,4 +1,5 @@
 // const mongoose = require('mongoose');
+const { generateResponse, createConnection } = require('/opt/nodejs/util')
 const dbUser =  process.env.DBUSER || null
 const dbPass = process.env.DBPASS || null
 const dbCluster = process.env.DBCLUSTER || null
@@ -26,7 +27,7 @@ exports.handler = async (event, context,callback) => {
   context.callbackWaitsForEmptyEventLoop = false
 
   if (conn == null) {
-    conn = await mongoose.createConnection(connnectString, {
+    conn = await createConnection(connnectString, {
       bufferCommands: false, // Disable mongoose buffering
       bufferMaxEntries: 0, // and MongoDB driver buffering
       // useFindAndModify:false,
@@ -73,36 +74,42 @@ exports.handler = async (event, context,callback) => {
     console.log('cached')
   }
   const wine = JSON.parse(event.body || '{}')
-  const {wineId} = event.pathParameters || {}
+  // const {wineId} = event.pathParameters || {}
   const userId = event.requestContext.authorizer.claims.email
+  const _id = wineId === 'new' ? new ObjectId() : wineId
+  const updatedWine = {
+    ...wine,
+    userId,
+  }
   try {
     console.log('will find')
-    let doc = await Wine.findOne(
-      {'$and' : [
-        {userId},
-        {_id:wineId}
-      ]})
-    if (!doc) {
-      console.log('not found')
-      const results = await Wine.create({...wine,userId})
-        callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(results),
-          headers: {
-              'Access-Control-Allow-Origin': '*',
-          }
-      })
-    } else {
-      doc = Object.assign(doc,wine)
-      const results = await doc.save()
-        callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(results),
-          headers: {
-              'Access-Control-Allow-Origin': '*',
-          },
-      });
-    }
+    let doc = await Wine.findOneAndUpdate({_id,userId},{updatedWine},{upsert:true})
+    //   {'$and' : [
+    //     {userId},
+    //     wineId === 'new' ? {} : {_id:wineId}
+    //   ]})
+    // if (!doc) {
+    //   console.log('not found')
+    //   const results = await Wine.create({...wine,userId})
+    //     callback(null, {
+    //       statusCode: 200,
+    //       body: JSON.stringify(results),
+    //       headers: {
+    //           'Access-Control-Allow-Origin': '*',
+    //       }
+    //   })
+    // } else {
+      // doc = Object.assign(doc,wine)
+      // const results = await doc.save()
+      generateResponse(callback,[doc])
+      //   callback(null, {
+      //     statusCode: 200,
+      //     body: JSON.stringify(results),
+      //     headers: {
+      //         'Access-Control-Allow-Origin': '*',
+      //     },
+      // });
+    // }
   } catch (err) {
     errorResponse(err, context.awsRequestId, callback);
   }

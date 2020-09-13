@@ -101,13 +101,7 @@ Resources:
         Policies:
           - CloudWatchLogsFullAccess
         Events:
-          Api1:
-              Type: Api
-              Properties:
-                Path: /wines/
-                Method: post
-                RestApiId: !Ref Api
-          Api2:
+          Api:
             Type: Api
             Properties:
               Path: /wines/{wineId}
