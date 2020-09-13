@@ -113,7 +113,7 @@ Resources:
     Properties:
       FunctionName: GetAllWines
       CodeUri: getAllWines
-      Handler: get.handler
+      Handler: index.handler
       Timeout: 15
       Environment:
         Variables:
@@ -132,6 +132,30 @@ Resources:
             Method: get
             RestApiId: !Ref Api
 
+  GetWine:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: GetWine
+      CodeUri: getAllWines
+      Handler: index.handler
+      Timeout: 15
+      Environment:
+        Variables:
+          DBPASS: !Ref DbPass
+          DBCLUSTER: !Ref DbCluster
+          DBUSER: !Ref DbUser
+      Layers:
+        - !Ref CommonNodeLayer
+      Policies:
+        - CloudWatchLogsFullAccess
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /wines/{wineId}
+            Method: get
+            RestApiId: !Ref Api          
+  
   UpdateWineCollectionDb:
     Type: AWS::Serverless::Function
     Properties:

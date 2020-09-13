@@ -50,11 +50,12 @@ exports.handler = async (event, context,callback) => {
   }
   const {wineId} = event.pathParameters || {}
   const userId = event.requestContext.authorizer.claims.email
-  const {keyOrder,order,limit,mostRecentUpdate} = event.queryStringParameters || {}
+  const {keyOrder,order,limit,mostRecentUpdate,cellarId} = event.queryStringParameters || {}
   const and = [
+    {userId},
     wineId ?  {_id : wineId} : {},
     mostRecentUpdate ? {updatedAt : {'$gte':mostRecentUpdate }} : {},
-    {cellarId : "5d20650b51531fcceabd73ba"} ,//{'$in' : req.cellars}}, // userId vaut saut req.params.uid , soit token.decoded.userId
+    cellarId ? {cellarId} : {} ,//{'$in' : req.cellars}}, // userId vaut saut req.params.uid , soit token.decoded.userId
   ]
 
   try {

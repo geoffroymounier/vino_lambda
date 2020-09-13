@@ -30,7 +30,7 @@ exports.handler = async (event, context,callback) => {
       bufferCommands: false, // Disable mongoose buffering
       bufferMaxEntries: 0, // and MongoDB driver buffering
       // useFindAndModify:false,
-      // useNewUrlParser: true,
+      useNewUrlParser: true,
       // autoIndex:false,
       // replicaSet:"Cluster0-shard-0",
       // ssl: true,
@@ -39,6 +39,7 @@ exports.handler = async (event, context,callback) => {
     conn.model('Wine', new mongoose.Schema(new Schema(
       {
           userId: {type:String,required:true},
+          cellarId: {type:ObjectId},
           stock : Number,
           photo:String,
           favorite : Boolean,
@@ -71,7 +72,6 @@ exports.handler = async (event, context,callback) => {
   } else {
     console.log('cached')
   }
-
   const wine = JSON.parse(event.body || '{}')
   const {wineId} = event.pathParameters || {}
   const userId = event.requestContext.authorizer.claims.email
@@ -84,7 +84,7 @@ exports.handler = async (event, context,callback) => {
       ]})
     if (!doc) {
       console.log('not found')
-      const results = await Wine.create(wine)
+      const results = await Wine.create({...wine,userId})
         callback(null, {
           statusCode: 200,
           body: JSON.stringify(results),
